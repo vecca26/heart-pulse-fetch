@@ -1,0 +1,23 @@
+{
+  "name": "heart-pulse-fetch",
+  "version": "1.0.2",
+  "description": "A server-aware adaptive prefetching library for React, Angular, and Node.",
+  "main": "pulse.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "prefetch",
+    "performance",
+    "react",
+    "angular",
+    "load-balancer",
+    "server-health"
+  ],
+  "author": "Vivekanand N Mestha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vecca26/heart-pulse-fetch.git"
+  }
+}
