@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseFetch - Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hover-trigger:hover .hover-target { display: block; }
+        .pulse-line {
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .app-window {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans h-screen overflow-hidden flex flex-col">
+
+    <!-- HEADER -->
+    <header class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+        <div>
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                pulse-fetch 💓
+            </h1>
+            <p class="text-slate-400 text-sm">Server-Aware Adaptive Prefetching Simulator</p>
+        </div>
+        <div class="text-right">
+            <div class="text-xs text-slate-400 uppercase tracking-widest">Global Status</div>
+            <div id="status-badge" class="font-bold text-green-400">OPTIMAL</div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex p-6 gap-6">
+
+        <!-- CONTROLS & SERVER SIMULATION -->
+        <section class="w-1/3 flex flex-col gap-6">
+            
+            <!-- Server Control Panel -->
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    Simulated Server Load
+                </h2>
+                
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-slate-400">CPU Usage</span>
+                        <span id="load-display" class="text-sm font-mono font-bold">10%</span>
+                    </div>
+                    <input type="range" id="load-slider" min="0" max="100" value="10" 
+                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    <div class="flex justify-between mt-2 text-xs text-slate-500">
+                        <span>Idle (Aggressive Prefetch)</span>
+                        <span>Meltdown (Blocked)</span>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded border border-slate-700">
+                    <div class="text-xs text-slate-500 mb-2">SERVER LOGS</div>
+                    <div id="server-logs" class="h-32 overflow-y-auto font-mono text-xs space-y-1">
+                        <!-- Logs go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Library Explanation -->
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex-1">
+                <h3 class="text-lg font-semibold mb-2">How it works</h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li class="flex gap-2">
+                        <span class="text-green-400">●</span> 
+                        <span><b>0-50% Load:</b> Frontend prefetches data immediately on hover.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-yellow-400">●</span> 
+                        <span><b>50-80% Load:</b> Frontend waits for click (Conservative).</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-red-400">●</span> 
+                        <span><b>80-100% Load:</b> Prefetching totally blocked to save server.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CLIENT SIMULATION -->
+        <section class="w-2/3 bg-slate-100 text-slate-900 rounded-xl overflow-hidden flex flex-col shadow-2xl relative">
+            <!-- Mock Browser Bar -->
+            <div class="bg-slate-200 p-3 border-b border-slate-300 flex items-center gap-2">
+                <div class="flex gap-1.5">
+                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                </div>
+                <div class="bg-white px-4 py-1 rounded-md text-xs text-slate-500 flex-1 text-center font-mono">
+                    https://my-awesome-app.com/dashboard
+                </div>
+            </div>
+
+            <!-- App Content -->
+            <div class="flex-1 p-8 relative">
+                
+                <!-- React App Container -->
+                <div id="react-app" class="max-w-2xl mx-auto">
+                    <div class="flex justify-between items-center mb-8">
+                        <h2 class="text-3xl font-bold text-slate-800">Shop Products</h2>
+                        <span id="client-strategy-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                            STRATEGY: AGGRESSIVE
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Product Card 1 -->
+                        <div class="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow cursor-pointer product-card" data-id="1">
+                            <div class="h-32 bg-slate-100 rounded-lg mb-4 flex items-center justify-center text-slate-400">
+                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-1">Wireless Headphones</h3>
+                            <p class="text-sm text-slate-500 mb-3">High fidelity audio with noise cancellation.</p>
+                            
+                            <!-- Visual Feedback for Prefetch -->
+                            <div class="prefetch-indicator absolute top-2 right-2 opacity-0 transition-opacity">
+                                <span class="bg-blue-500 text-white text-[10px] px-2 py-1 rounded shadow-lg">
+                                    Prefetching... ⬇️
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Product Card 2 -->
+                        <div class="group relative bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow cursor-pointer product-card" data-id="2">
+                            <div class="h-32 bg-slate-100 rounded-lg mb-4 flex items-center justify-center text-slate-400">
+                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-1">Smart Phone Pro</h3>
+                            <p class="text-sm text-slate-500 mb-3">The latest in mobile technology.</p>
+                            
+                            <div class="prefetch-indicator absolute top-2 right-2 opacity-0 transition-opacity">
+                                <span class="bg-blue-500 text-white text-[10px] px-2 py-1 rounded shadow-lg">
+                                    Prefetching... ⬇️
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+                        <p><b>Try it:</b> Hover over the product cards. Watch the "Prefetching" badge. Then, increase the Server Load slider on the left to > 80% and try hovering again.</p>
+                    </div>
+                </div>
+
+                <!-- Network Tab Visualization -->
+                <div class="absolute bottom-0 left-0 right-0 h-48 bg-white border-t border-slate-200 p-4 transition-transform transform translate-y-0" id="network-panel">
+                    <div class="text-xs font-bold text-slate-500 mb-2 flex justify-between">
+                        <span>NETWORK ACTIVITY (SIMULATED)</span>
+                        <button onclick="clearNetworkLogs()" class="text-blue-500 hover:underline">Clear</button>
+                    </div>
+                    <div id="network-logs" class="h-full overflow-y-auto font-mono text-xs space-y-1 pb-8">
+                        <!-- Network logs go here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // 1. LIBRARY CODE (Embedded for Demo)
+        // ==========================================
+        
+        class PulseServer {
+            constructor() {
+                this.load = 0.1;
+            }
+            setLoad(val) { this.load = val / 100; }
+            getLoad() { return this.load; }
+        }
+
+        class PulseClient {
+            constructor() {
+                this.serverLoad = 0.1;
+                this.strategy = 'aggressive';
+                this.observers = [];
+            }
+
+            // Simulate receiving a heartbeat from server
+            syncWithServer(load) {
+                this.serverLoad = load;
+                this.updateStrategy();
+            }
+
+            updateStrategy() {
+                let newStrategy = 'aggressive';
+                if (this.serverLoad > 0.5) newStrategy = 'conservative';
+                if (this.serverLoad > 0.8) newStrategy = 'blocked';
+                
+                if (this.strategy !== newStrategy) {
+                    this.strategy = newStrategy;
+                    this.notifyObservers();
+                }
+            }
+
+            subscribe(fn) {
+                this.observers.push(fn);
+                fn(this.strategy); // Initial call
+            }
+
+            notifyObservers() {
+                this.observers.forEach(fn => fn(this.strategy));
+            }
+
+            shouldPrefetch() {
+                return this.strategy === 'aggressive';
+            }
+        }
+
+        // ==========================================
+        // 2. DEMO LOGIC
+        // ==========================================
+
+        const server = new PulseServer();
+        const client = new PulseClient();
+
+        // UI References
+        const slider = document.getElementById('load-slider');
+        const loadDisplay = document.getElementById('load-display');
+        const serverLogs = document.getElementById('server-logs');
+        const networkLogs = document.getElementById('network-logs');
+        const strategyBadge = document.getElementById('client-strategy-badge');
+        const globalStatus = document.getElementById('status-badge');
+
+        // 1. Initialize Server Controls
+        slider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            server.setLoad(val);
+            loadDisplay.innerText = val + '%';
+            
+            // Sync mock network delay
+            client.syncWithServer(server.getLoad());
+            
+            // Visual Updates
+            updateServerUI(val);
+        });
+
+        function updateServerUI(val) {
+            let color = 'text-green-400';
+            let status = 'OPTIMAL';
+            
+            if (val > 50) { color = 'text-yellow-400'; status = 'WARN'; }
+            if (val > 80) { color = 'text-red-500'; status = 'CRITICAL'; }
+
+            globalStatus.className = `font-bold ${color}`;
+            globalStatus.innerText = status;
+
+            logServer(`Load adjusted to ${val}%`);
+        }
+
+        // 2. Client Strategy Listener
+        client.subscribe((strategy) => {
+            const colors = {
+                'aggressive': 'bg-green-100 text-green-800 border-green-200',
+                'conservative': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                'blocked': 'bg-red-100 text-red-800 border-red-200'
+            };
+            
+            strategyBadge.className = `px-3 py-1 rounded-full text-xs font-bold border ${colors[strategy]}`;
+            strategyBadge.innerText = `STRATEGY: ${strategy.toUpperCase()}`;
+            
+            logServer(`Client switched to strategy: ${strategy}`);
+        });
+
+        // 3. Product Interaction (The "Magic")
+        const cards = document.querySelectorAll('.product-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const id = card.getAttribute('data-id');
+                
+                // CHECK PULSE FETCH LOGIC
+                if (client.shouldPrefetch()) {
+                    triggerPrefetch(card, id);
+                } else {
+                    logNetwork(`GET /api/product/${id} [PREFETCH BLOCKED due to Load]`, 'text-red-500');
+                }
+            });
+        });
+
+        function triggerPrefetch(card, id) {
+            // Check if already prefetched to avoid spam in demo
+            if (card.dataset.prefetched === "true") return;
+            
+            const indicator = card.querySelector('.prefetch-indicator');
+            indicator.style.opacity = '1';
+            
+            logNetwork(`GET /api/product/${id} [PREFETCH SENT]`, 'text-blue-600');
+            
+            // Simulate network request
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                card.dataset.prefetched = "true";
+            }, 800);
+        }
+
+        // Helpers
+        function logServer(msg) {
+            const div = document.createElement('div');
+            div.innerHTML = `<span class="opacity-50">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            serverLogs.prepend(div);
+        }
+
+        function logNetwork(msg, colorClass) {
+            const div = document.createElement('div');
+            div.className = `border-b border-slate-100 py-1 ${colorClass}`;
+            div.innerHTML = `<span class="opacity-50 font-mono text-slate-400">xhr</span> ${msg}`;
+            networkLogs.prepend(div);
+        }
+
+        function clearNetworkLogs() {
+            networkLogs.innerHTML = '';
+            cards.forEach(c => c.dataset.prefetched = "false");
+        }
+
+        // Init
+        updateServerUI(10);
+    </script>
+</body>
+</html>
